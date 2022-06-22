@@ -12,6 +12,7 @@ void draw_with_cursor(COORD cursor_coord, std::string output, int radius=1);
 void show_circle_around_cursor(COORD coord);
 void KeyEventProc(KEY_EVENT_RECORD);
 void error_exit(string message);
+void reset_terminal();
 
 int main() {
     bool just_started = true;
@@ -64,17 +65,17 @@ int main() {
                 }
                 break;
             case KEY_EVENT:
-                SetConsoleMode(hStdin, fdwSaveOldMode);  // Restore input mode on exit.
-                ynot::set_cursor_style(CursorStyle::not_hidden);
-                ynot::restore_screen_buffer();
-                return 0;
+                WCHAR key = irInBuf[i].Event.KeyEvent.uChar.UnicodeChar;
+                if (key == '\x1b')  // escape
+                {
+                    reset_terminal();
+                    return 0;
+                }
             }
         }
     }
 
-    SetConsoleMode(hStdin, fdwSaveOldMode);  // Restore input mode on exit.
-    ynot::set_cursor_style(CursorStyle::not_hidden);
-    ynot::restore_screen_buffer();
+    reset_terminal();
     return 0;
 }
 
@@ -107,8 +108,12 @@ void show_circle_around_cursor(COORD cursor_coord) {
 void error_exit(string message) {
     cout << "Error:" << message;
     ynot::sleep_(5000);
+    reset_terminal();
+    ExitProcess(0);
+}
+
+void reset_terminal() {
     SetConsoleMode(hStdin, fdwSaveOldMode);  // Restore input mode on exit.
     ynot::set_cursor_style(CursorStyle::not_hidden);
     ynot::restore_screen_buffer();
-    ExitProcess(0);
 }
