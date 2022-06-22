@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdio.h>
 using namespace std;
+using ynot::CursorStyle;
 
 HANDLE hStdin;
 DWORD fdwSaveOldMode;
@@ -15,7 +16,7 @@ void error_exit(string message);
 int main() {
     bool just_started = true;
     ynot::alternate_screen_buffer();
-    ynot::set_cursor_style(ynot::CursorStyle::hidden);
+    ynot::set_cursor_style(CursorStyle::hidden);
     DWORD cNumRead, fdwMode, i;
     INPUT_RECORD irInBuf[128];
 
@@ -64,6 +65,7 @@ int main() {
                 break;
             case KEY_EVENT:
                 SetConsoleMode(hStdin, fdwSaveOldMode);  // Restore input mode on exit.
+                ynot::set_cursor_style(CursorStyle::not_hidden);
                 ynot::restore_screen_buffer();
                 return 0;
             }
@@ -71,6 +73,7 @@ int main() {
     }
 
     SetConsoleMode(hStdin, fdwSaveOldMode);  // Restore input mode on exit.
+    ynot::set_cursor_style(CursorStyle::not_hidden);
     ynot::restore_screen_buffer();
     return 0;
 }
@@ -105,6 +108,7 @@ void error_exit(string message) {
     cout << "Error:" << message;
     ynot::sleep_(5000);
     SetConsoleMode(hStdin, fdwSaveOldMode);  // Restore input mode on exit.
+    ynot::set_cursor_style(CursorStyle::not_hidden);
     ynot::restore_screen_buffer();
     ExitProcess(0);
 }
