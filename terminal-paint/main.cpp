@@ -1,4 +1,4 @@
-#include "ynot/ynot.h"
+#include "../ynot/ynot/ynot.h"
 #include <string>
 #include <windows.h>
 #include <stdio.h>
@@ -106,7 +106,7 @@ void show_circle_around_cursor(COORD cursor_coord) {
 }
 
 void error_exit(string message) {
-    cout << "Error:" << message;
+    ynot::print("Error:" + message);
     ynot::sleep_(5000);
     reset_terminal();
     ExitProcess(0);

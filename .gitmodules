@@ -1,0 +1,3 @@
+[submodule "ynot"]
+	path = ynot
+	url = https://github.com/wheelercj/ynot
