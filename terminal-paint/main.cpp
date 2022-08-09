@@ -84,7 +84,7 @@ void draw_with_cursor(COORD cursor_coord, std::string output, int radius) {
     for (int x = cursor_coord.X - radius + 1; x <= cursor_coord.X + radius - 1; x++) {
         for (int y = cursor_coord.Y - radius + 1; y <= cursor_coord.Y + radius - 1; y++) {
             if (window_size.y > y && window_size.x > x && y >= 0 && x >= 0)
-                ynot::print_at(x, y, output);
+                ynot::print_at(x + 1, y + 1, output);
         }
     }
 }
