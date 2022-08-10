@@ -8,10 +8,10 @@ using ynot::Coord;
 HANDLE hStdin;
 DWORD fdwSaveOldMode;
 
-vector<vector<string>> init_picture(Coord window_size);
-void print_entire_picture(vector<vector<string>> picture, Coord window_size);
+vector<vector<string>> init_canvas(Coord window_size);
+void print_entire_canvas(vector<vector<string>> canvas, Coord window_size);
 void show_menu(string& drawing_character, int& drawing_radius);
-void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& picture, Coord window_size);
+void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size);
 void KeyEventProc(KEY_EVENT_RECORD);
 void error_exit(string message);
 void reset_terminal();
@@ -22,7 +22,7 @@ int main()
 	ynot::alternate_screen_buffer();
 	ynot::set_cursor_style(CursorStyle::hidden);
 	Coord window_size = ynot::get_window_size();
-	vector<vector<string>> picture = init_picture(window_size);
+	vector<vector<string>> canvas = init_canvas(window_size);
 	DWORD cNumRead, fdwMode, i;
 	INPUT_RECORD irInBuf[128];
 
@@ -68,10 +68,10 @@ int main()
 				switch (mer.dwButtonState)
 				{
 				case 1:
-					draw(drawing_character, coord, drawing_radius, picture, window_size);
+					draw(drawing_character, coord, drawing_radius, canvas, window_size);
 					break;
 				case 2:
-					draw(" ", coord, drawing_radius, picture, window_size);
+					draw(" ", coord, drawing_radius, canvas, window_size);
 					break;
 				}
 				break;
@@ -88,7 +88,7 @@ int main()
 				{
 					show_menu(drawing_character, drawing_radius);
 					ynot::clear_screen();
-					print_entire_picture(picture, window_size);
+					print_entire_canvas(canvas, window_size);
 				}
 			}
 		}
@@ -98,25 +98,25 @@ int main()
 	return 0;
 }
 
-vector<vector<string>> init_picture(Coord window_size)
+vector<vector<string>> init_canvas(Coord window_size)
 {
-	vector<vector<string>> picture;
-	picture.resize(size_t(window_size.y + 10));
-	for (size_t y = 0; y < picture.size(); y++)
+	vector<vector<string>> canvas;
+	canvas.resize(size_t(window_size.y + 10));
+	for (size_t y = 0; y < canvas.size(); y++)
 	{
-		picture[y].resize(size_t(window_size.x + 10));
-		for (size_t x = 0; x < picture[y].size(); x++)
-			picture[y][x] = " ";
+		canvas[y].resize(size_t(window_size.x + 10));
+		for (size_t x = 0; x < canvas[y].size(); x++)
+			canvas[y][x] = " ";
 	}
-	return picture;
+	return canvas;
 }
 
-void print_entire_picture(vector<vector<string>> picture, Coord window_size)
+void print_entire_canvas(vector<vector<string>> canvas, Coord window_size)
 {
 	for (int y = 0; y < window_size.y; y++)
 	{
 		for (int x = 0; x < window_size.x; x++)
-			ynot::print_at(x, y, picture[y][x]);
+			ynot::print_at(x, y, canvas[y][x]);
 	}
 }
 
@@ -228,13 +228,13 @@ void show_menu(string& drawing_character, int& drawing_radius)
 	}
 }
 
-void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& picture, Coord window_size)
+void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size)
 {
 	for (int x = cursor_coord.X - radius + 1; x <= cursor_coord.X + radius - 1; x++) {
 		for (int y = cursor_coord.Y - radius + 1; y <= cursor_coord.Y + radius - 1; y++) {
 			if (window_size.y > y && window_size.x > x && y >= 0 && x >= 0)
 			{
-				picture[y + 1][x + 1] = output;
+				canvas[y + 1][x + 1] = output;
 				ynot::print_at(x + 1, y + 1, output);
 			}
 		}
