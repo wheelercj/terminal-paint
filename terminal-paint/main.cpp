@@ -241,8 +241,8 @@ bool show_canvas_menu(string& drawing_character, int& drawing_radius)
         ║ ═ ╬ ╩ ╠ ╦ ╣ ╝ ╚ ╔ ╗
         a s d f g h j k l ; '
 
-        █ ▓ ▒ ░ ▄ ▀ ■ ≡ . ·
-        z x c v b n m , . /
+        █ ▓ ▒ ▄ ▀ ■ ≡ . ·
+        z x c v b n m , .
         )canvas_menu"));
 	string key = "tab";
 	while (key == "tab")
@@ -309,18 +309,16 @@ bool show_canvas_menu(string& drawing_character, int& drawing_radius)
 		else if (key == "c")
 			drawing_character = "▒";
 		else if (key == "v")
-			drawing_character = "░";
-		else if (key == "b")
 			drawing_character = "▄";
-		else if (key == "n")
+		else if (key == "b")
 			drawing_character = "▀";
-		else if (key == "m")
+		else if (key == "n")
 			drawing_character = "■";
-		else if (key == ",")
+		else if (key == "m")
 			drawing_character = "≡";
-		else if (key == ".")
+		else if (key == ",")
 			drawing_character = ".";
-		else if (key == "/")
+		else if (key == ".")
 			drawing_character = "·";
 	}
 
