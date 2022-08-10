@@ -6,7 +6,7 @@ using ynot::CursorStyle;
 HANDLE hStdin;
 DWORD fdwSaveOldMode;
 
-void draw_with_cursor(COORD cursor_coord, std::string output, int radius=1);
+void draw(string output, COORD cursor_coord, int radius=1);
 void show_circle_around_cursor(COORD coord);
 void KeyEventProc(KEY_EVENT_RECORD);
 void error_exit(string message);
@@ -57,10 +57,10 @@ int main() {
                 //show_circle_around_cursor(coord);
                 switch (mer.dwButtonState) {
                 case 1:
-                    draw_with_cursor(coord, drawing_character, drawing_radius);
+                    draw(drawing_character, coord, drawing_radius);
                     break;
                 case 2:
-                    draw_with_cursor(coord, " ", drawing_radius);
+                    draw(" ", coord, drawing_radius);
                     break;
                 }
                 break;
@@ -85,7 +85,7 @@ int main() {
     return 0;
 }
 
-void draw_with_cursor(COORD cursor_coord, std::string output, int radius) {
+void draw(string output, COORD cursor_coord, int radius) {
     ynot::Coord window_size = ynot::get_window_size();
     for (int x = cursor_coord.X - radius + 1; x <= cursor_coord.X + radius - 1; x++) {
         for (int y = cursor_coord.Y - radius + 1; y <= cursor_coord.Y + radius - 1; y++) {
