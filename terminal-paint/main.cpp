@@ -1,7 +1,5 @@
 #include "../ynot/ynot/ynot.h"
 #include <string>
-#include <windows.h>
-#include <stdio.h>
 using namespace std;
 using ynot::CursorStyle;
 
