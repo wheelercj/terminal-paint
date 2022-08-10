@@ -7,7 +7,6 @@ HANDLE hStdin;
 DWORD fdwSaveOldMode;
 
 void draw(string output, COORD cursor_coord, int radius=1);
-void show_circle_around_cursor(COORD coord);
 void KeyEventProc(KEY_EVENT_RECORD);
 void error_exit(string message);
 void reset_terminal();
@@ -54,7 +53,6 @@ int main() {
             case MOUSE_EVENT:
                 MOUSE_EVENT_RECORD mer = irInBuf[i].Event.MouseEvent;
                 COORD coord = mer.dwMousePosition;
-                //show_circle_around_cursor(coord);
                 switch (mer.dwButtonState) {
                 case 1:
                     draw(drawing_character, coord, drawing_radius);
@@ -91,22 +89,6 @@ void draw(string output, COORD cursor_coord, int radius) {
         for (int y = cursor_coord.Y - radius + 1; y <= cursor_coord.Y + radius - 1; y++) {
             if (window_size.y > y && window_size.x > x && y >= 0 && x >= 0)
                 ynot::print_at(x + 1, y + 1, output);
-        }
-    }
-}
-
-void show_circle_around_cursor(COORD cursor_coord) {
-    ynot::clear_screen();
-    ynot::Coord window_size = ynot::get_window_size();
-    int radius = 5;
-    if (window_size.y > cursor_coord.Y
-            && window_size.x > cursor_coord.X
-            && cursor_coord.Y >= 0
-            && cursor_coord.X >= 0) {
-        for (int degree = 0; degree < 360; degree += 8) {
-            int x = int(cursor_coord.X + radius * cos(degree / 360.0 * 2 * 3.1415926535898));
-            int y = int(cursor_coord.Y + radius * sin(degree / 360.0 * 2 * 3.1415926535898));
-            ynot::print_at(x, y, "*");
         }
     }
 }
