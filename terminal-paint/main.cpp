@@ -34,6 +34,8 @@ int main() {
     if (!SetConsoleMode(hStdin, fdwMode))
         error_exit("SetConsoleMode");
 
+    int drawing_radius = 1;
+    string drawing_character = "*";
     while (true) {
         if (!ReadConsoleInput(
             hStdin,      // input buffer handle
@@ -57,10 +59,10 @@ int main() {
                 //show_circle_around_cursor(coord);
                 switch (mer.dwButtonState) {
                 case 1:
-                    draw_with_cursor(coord, "*");
+                    draw_with_cursor(coord, drawing_character, drawing_radius);
                     break;
                 case 2:
-                    draw_with_cursor(coord, " ", 3);
+                    draw_with_cursor(coord, " ", drawing_radius);
                     break;
                 }
                 break;
@@ -71,6 +73,12 @@ int main() {
                     reset_terminal();
                     return 0;
                 }
+                if (key >= '1' and key <= '9')
+                    drawing_radius = key - '0';
+                /*else if (key == 'a')
+                    drawing_character = "*";
+                else if (key == 'b')
+                    drawing_character = "█";*/
             }
         }
     }
