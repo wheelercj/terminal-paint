@@ -12,7 +12,6 @@ vector<vector<string>> init_canvas(Coord window_size);
 void print_entire_canvas(vector<vector<string>> canvas, Coord window_size);
 void show_menu(string& drawing_character, int& drawing_radius);
 void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size);
-void KeyEventProc(KEY_EVENT_RECORD);
 void error_exit(string message);
 void reset_terminal();
 
