@@ -1,4 +1,5 @@
 #include "../ynot/ynot/ynot.h"
+#include <map>
 #include <string>
 #include <vector>
 using namespace std;
@@ -9,15 +10,16 @@ HANDLE hStdin;
 DWORD fdwSaveOldMode;
 
 bool confirmed_dont_save();
-void notify(string message, Coord window_size);
-void show_help(Coord window_size);
+void show_help();
 bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& drawing_character, int& drawing_radius);
 vector<vector<string>> init_canvas(Coord window_size);
 void clear_canvas(vector<vector<string>>& canvas);
 void load_canvas(vector<vector<string>>& canvas, Coord window_size);
 void save_canvas(vector<vector<string>>& canvas);
 void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size);
-bool show_canvas_menu(string& drawing_character, int& drawing_radius);
+bool show_canvas_menu(string& drawing_character);
+void print_canvas_menu(const map<string, vector<string>>& char_map);
+bool show_char_menu(vector<string> char_options, string& drawing_character);
 void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size);
 void error_exit(string message);
 void reset_terminal();
@@ -55,20 +57,19 @@ int main()
 		{
 			save_canvas(canvas);
 			saved = true;
-			notify("Canvas saved.", window_size);
+			ynot::Notification("Canvas saved.").run();
 		}
 		else if (choice == "clear" && (saved || confirmed_dont_save()))
 		{
 			clear_canvas(canvas);
 			saved = true;
-			notify("Canvas cleared.", window_size);
+			ynot::Notification("Canvas cleared.").run();
 		}
 		else if (choice == "help")
 		{
-			show_help(window_size);
+			show_help();
 		}
 	}
-
 	reset_terminal();
 	return 0;
 }
@@ -84,18 +85,11 @@ bool confirmed_dont_save()
 		return false;
 }
 
-void notify(string message, Coord window_size)
+void show_help()
 {
-	ynot::clear_screen();
-	ynot::set_cursor_coords(1, 3);
-	ynot::print(ynot::dedent(message));
-	ynot::print("\n\n     Press any key to continue.");
-	ynot::pause();
-}
-
-void show_help(Coord window_size)
-{
-	notify(R"(
+	ynot::Notification(R"(
+		terminal paint
+		
 		In the paint canvas:
 		• press tab to open the brush selection menu 
 		  and any other key to close it
@@ -104,7 +98,8 @@ void show_help(Coord window_size)
 		• use the number keys to control the brush radius
 		• for more help, join the discussions at
 		  https://github.com/wheelercj/terminal-paint/discussions
-		)", window_size);
+		)").run();
+	ynot::alternate_screen_buffer();
 }
 
 /* Returns true if the canvas changed, false otherwise. */
@@ -173,7 +168,7 @@ bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& draw
 					drawing_radius = key - '0';
 				else if (key == '\t')
 				{
-					if (!show_canvas_menu(drawing_character, drawing_radius))
+					if (!show_canvas_menu(drawing_character))
 						return canvas_changed;
 					ynot::clear_screen();
 					print_entire_canvas(canvas, window_size);
@@ -225,105 +220,101 @@ void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size)
 }
 
 /* Returns true if returning to the canvas, false if returning to the main menu. */
-bool show_canvas_menu(string& drawing_character, int& drawing_radius)
+bool show_canvas_menu(string& drawing_character)
 {
-	ynot::clear_screen();
-	ynot::print_at(1, 1, ynot::dedent(R"canvas_menu(
-        Press tab to open this menu and any other key to close it.
-        Press escape to return to the main menu.
-        In the canvas, left click to draw and right click to erase.
-        The number keys control the brush radius.
-
-        Press a key to choose a symbol to draw with:
-
-        │ ─ ┼ ┴ ├ ┬ ┤ ┘ └ ┌ ┐ *
-        q w e r t y u i o p [ ]
-
-        ║ ═ ╬ ╩ ╠ ╦ ╣ ╝ ╚ ╔ ╗
-        a s d f g h j k l ; '
-
-        █ ▓ ▒ ▄ ▀ ■ ≡ . ·
-        z x c v b n m , .
-        )canvas_menu"));
-	string key = "tab";
-	while (key == "tab")
+	map<string, vector<string>> char_map = {
+		{ "0", { "choose with your keyboard" }},
+		{ "1", { "█", "▓", "▒", "▐", "▄", "▌", "▀", "■", "▬" }},
+		{ "2", { "…", "·", "•", "◘", "○", "◙", "°", "º", "☼", "ø" }},
+		{ "3", { "│", "─", "┼", "┴", "├", "┬", "┤", "┘", "└", "┌", "┐" }},
+		{ "4", { "║", "═", "╬", "╩", "╠", "╦", "╣", "╝", "╚", "╔", "╗" }},
+		{ "5", { "╡", "╞", "╢", "╟", "╪", "╫", "╧", "╨", "╤", "╥", "╘", "╙", "╒", "╓", "╕", "╖", "╛", "╜" }},
+		{ "6", { "↑", "↓", "↕", "↨", "←", "→", "↔", "◄", "►", "«", "»", "‹", "›" }},
+		{ "7", { "¤", "¢", "€", "£", "¥", "₧", "©", "®", "™" }},
+		{ "8", { "±", "×", "≤", "≥", "≈", "≡", "√", "⌠", "⌡", "∟", "⌐", "¬" }},
+		{ "9", { "☺", "☻", "♥", "♦", "♣", "♠", "♪", "♫", "⌂", "∩", "¦", "†", "‡" }},
+		{ "a", { "α", "ß", "Γ", "π", "Σ", "σ", "µ", "τ", "Φ", "Θ", "Ω", "δ", "∞", "φ", "ε" }}
+	};
+	print_canvas_menu(char_map);
+	while (true)
 	{
-		key = ynot::get_key();
+		string key = ynot::get_key();
 		if (key == "escape")
 			return false;
-		try
-		{
-			drawing_radius = stoi(key);
-		}
-		catch (std::invalid_argument) {}
-		catch (std::out_of_range) {}
-		if (key == "q")
-			drawing_character = "│";
-		else if (key == "w")
-			drawing_character = "─";
-		else if (key == "e")
-			drawing_character = "┼";
-		else if (key == "r")
-			drawing_character = "┴";
-		else if (key == "t")
-			drawing_character = "├";
-		else if (key == "y")
-			drawing_character = "┬";
-		else if (key == "u")
-			drawing_character = "┤";
-		else if (key == "i")
-			drawing_character = "┘";
-		else if (key == "o")
-			drawing_character = "└";
-		else if (key == "p")
-			drawing_character = "┌";
-		else if (key == "[")
-			drawing_character = "┐";
-		else if (key == "]")
-			drawing_character = "*";
-		else if (key == "a")
-			drawing_character = "║";
-		else if (key == "s")
-			drawing_character = "═";
-		else if (key == "d")
-			drawing_character = "╬";
-		else if (key == "f")
-			drawing_character = "╩";
-		else if (key == "g")
-			drawing_character = "╠";
-		else if (key == "h")
-			drawing_character = "╦";
-		else if (key == "j")
-			drawing_character = "╣";
-		else if (key == "k")
-			drawing_character = "╝";
-		else if (key == "l")
-			drawing_character = "╚";
-		else if (key == ";")
-			drawing_character = "╔";
-		else if (key == "'")
-			drawing_character = "╗";
-		else if (key == "z")
-			drawing_character = "█";
-		else if (key == "x")
-			drawing_character = "▓";
-		else if (key == "c")
-			drawing_character = "▒";
-		else if (key == "v")
-			drawing_character = "▄";
-		else if (key == "b")
-			drawing_character = "▀";
-		else if (key == "n")
-			drawing_character = "■";
-		else if (key == "m")
-			drawing_character = "≡";
-		else if (key == ",")
-			drawing_character = ".";
-		else if (key == ".")
-			drawing_character = "·";
+		if (char_map.count(key) == 0)
+			continue;
+		else
+			if (show_char_menu(char_map[key], drawing_character))
+				return true;
+			else
+				print_canvas_menu(char_map);
 	}
+}
 
-	return true;
+void print_canvas_menu(const map<string, vector<string>>& char_map)
+{
+	ynot::clear_screen();
+	string canvas_menu_str = ynot::dedent(R"canvas_menu(
+		Press tab to open this menu and any other key to close it.
+		Press escape to return to the main menu.
+		In the canvas:
+		• left click to draw and right click to erase
+		• the number keys control the brush radius
+		
+		To change the drawing character, choose a category:
+		
+		)canvas_menu");
+	for (const auto& row : char_map)
+	{
+		string row_str = "\x1b[42m" + row.first + "│\x1b[0m";
+		for (const string& cell : row.second)
+			row_str += " " + cell;
+		canvas_menu_str += row_str + "\n";
+	}
+	ynot::print_at(1, 1, canvas_menu_str);
+}
+
+/* Returns true if a new drawing character was chosen, false otherwise. */
+bool show_char_menu(vector<string> char_options, string& drawing_character)
+{
+	ynot::clear_screen();
+	string selectors = "\x1b[4;42m";
+	int i = 0;
+	for (; i < char_options.size() && i < 9; i++)
+		selectors += " " + to_string(i + 1);
+	for (; i < char_options.size(); i++)
+	{
+		selectors += " ";
+		selectors.push_back(char('a' + i - 9));
+	}
+	ynot::print_at(1, 1, selectors + " \x1b[0m\n");
+	for (const string& ch : char_options)
+		ynot::print(" " + ch);
+	while (true)
+	{
+		string key = ynot::get_key();
+		if (key == "escape")
+			return false;
+		if (key == "")
+			continue;
+		if (key == "0")
+			drawing_character = ynot::get_key();
+		else if (key[0] > '0' && key[0] <= '9')
+		{
+			size_t index = size_t(key[0] - '1');
+			if (index >= char_options.size())
+				continue;
+			drawing_character = char_options[index];
+		}
+		else
+		{
+			size_t index = size_t(key[0] - 'a' + 9);
+			if (index >= char_options.size())
+				continue;
+			drawing_character = char_options[index];
+		}
+		return true;
+	}
 }
 
 void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size)
