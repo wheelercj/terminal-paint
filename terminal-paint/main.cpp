@@ -110,6 +110,7 @@ void show_help(Coord window_size)
 /* Returns true if the canvas changed, false otherwise. */
 bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& drawing_character, int& drawing_radius)
 {
+	print_entire_canvas(canvas, window_size);
 	bool canvas_changed = false;
 	DWORD cNumRead, fdwMode, i;
 	INPUT_RECORD irInBuf[128];
