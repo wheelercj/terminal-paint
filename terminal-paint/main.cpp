@@ -57,13 +57,13 @@ int main()
 		{
 			save_canvas(canvas);
 			saved = true;
-			ynot::Notification("Canvas saved.").run();
+			ynot::notify("Canvas saved.");
 		}
 		else if (choice == "clear" && (saved || confirmed_dont_save()))
 		{
 			clear_canvas(canvas);
 			saved = true;
-			ynot::Notification("Canvas cleared.").run();
+			ynot::notify("Canvas cleared.");
 		}
 		else if (choice == "help")
 		{
@@ -87,7 +87,7 @@ bool confirmed_dont_save()
 
 void show_help()
 {
-	ynot::Notification(R"(
+	ynot::notify(R"(
 		terminal paint
 		
 		In the paint canvas:
@@ -98,7 +98,7 @@ void show_help()
 		• use the number keys to control the brush radius
 		• for more help, join the discussions at
 		  https://github.com/wheelercj/terminal-paint/discussions
-		)").run();
+		)");
 	ynot::alternate_screen_buffer();
 }
 
