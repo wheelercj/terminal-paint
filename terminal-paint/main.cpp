@@ -1,4 +1,6 @@
 #include "../ynot/ynot/ynot.h"
+#include <Commdlg.h>
+#include <fstream>
 #include <map>
 #include <string>
 #include <vector>
@@ -11,13 +13,15 @@ DWORD fdwSaveOldMode;
 
 void validate_char_map();
 map<string, vector<string>> get_char_map();
-bool confirmed_dont_save();
+bool confirmed_dont_save(vector<vector<string>>& canvas);
 void show_help();
 bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& brush_character, int& brush_radius);
 vector<vector<string>> init_canvas(Coord window_size);
 void clear_canvas(vector<vector<string>>& canvas);
-void load_canvas(vector<vector<string>>& canvas, Coord window_size);
-void save_canvas(vector<vector<string>>& canvas);
+string choose_file_to_load();
+string create_save_file();
+bool load_canvas(vector<vector<string>>& canvas);
+bool save_canvas(vector<vector<string>>& canvas);
 void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size);
 bool show_canvas_menu(string& brush_character);
 void print_canvas_menu(const map<string, vector<string>>& char_map);
@@ -28,9 +32,10 @@ void reset_terminal();
 
 int main()
 {
+	validate_char_map();
 	ynot::alternate_screen_buffer();
 	ynot::reset_on_keyboard_interrupt();
-	ynot::Menu main_menu("terminal paint", { "paint", "help", "exit" });
+	ynot::Menu main_menu("terminal paint", { "paint", "save", "clear", "help", "exit" });
 	//ynot::Menu main_menu("terminal paint", { "paint", "load", "save", "clear", "help", "exit" });
 	Coord window_size = ynot::get_window_size();
 	vector<vector<string>> canvas = init_canvas(window_size);
@@ -39,7 +44,7 @@ int main()
 
 	string choice = "";
 	bool saved = true;
-	while (choice != "exit" /*|| (!saved && !confirmed_dont_save())*/)
+	while (choice != "exit" || (!saved && !confirmed_dont_save(canvas)))
 	{
 		choice = main_menu.run();
 		ynot::alternate_screen_buffer();
@@ -48,19 +53,21 @@ int main()
 			if (open_canvas(canvas, window_size, brush_character, brush_radius))
 				saved = false;
 		}
-		else if (choice == "load" && (saved || confirmed_dont_save()))
+		else if (choice == "load" && (saved || confirmed_dont_save(canvas)))
 		{
-			load_canvas(canvas, window_size);
+			if (!load_canvas(canvas))
+				continue;
 			if (open_canvas(canvas, window_size, brush_character, brush_radius))
 				saved = false;
 		}
 		else if (choice == "save")
 		{
-			save_canvas(canvas);
+			if (!save_canvas(canvas))
+				continue;
 			saved = true;
 			ynot::notify("Canvas saved.");
 		}
-		else if (choice == "clear" && (saved || confirmed_dont_save()))
+		else if (choice == "clear" && (saved || confirmed_dont_save(canvas)))
 		{
 			clear_canvas(canvas);
 			saved = true;
@@ -117,15 +124,23 @@ map<string, vector<string>> get_char_map()
 	};
 }
 
-bool confirmed_dont_save()
+bool confirmed_dont_save(vector<vector<string>>& canvas)
 {
 	ynot::Menu confirmation_menu("Save changes?", { "save", "don't save", "cancel" });
 	string choice = confirmation_menu.run();
 	ynot::alternate_screen_buffer();
+	ynot::print_at(5, 5, "Saving . . .");
+	if (choice == "save")
+	{
+		if (!save_canvas(canvas))
+			return false;
+		ynot::notify("Saved.");
+		reset_terminal();
+		exit(0);
+	}
 	if (choice == "don't save")
 		return true;
-	else
-		return false;
+	return false;
 }
 
 void show_help()
@@ -134,12 +149,19 @@ void show_help()
 		terminal paint
 		
 		In the paint canvas:
-		• press tab to open or close the brush selection menu
-		• press escape to return to the main menu
 		• left click to draw and right click to erase
 		• use the number keys to control the brush radius
-		• for more help, join the discussions at
-		  https://github.com/wheelercj/terminal-paint/discussions
+		• press tab to open or close the brush selection menu
+		• press escape to return to the main menu
+		
+		You can save using the save option in the main menu or
+		with shift & drag to select part of the screen and ctrl+c
+		to copy. Saving emoji may have unpredictable results; it
+		helps to not have 3 or more emoji on the same line next
+		to each other, and redrawing emoji can fix some issues.
+
+		For more help, join the discussions at
+		https://github.com/wheelercj/terminal-paint/discussions
 		)");
 	ynot::alternate_screen_buffer();
 }
@@ -243,14 +265,125 @@ void clear_canvas(vector<vector<string>>& canvas)
 	}
 }
 
-void load_canvas(vector<vector<string>>& canvas, Coord window_size)
+/* Returns the file path, or an empty string if canceled. */
+string choose_file_to_load()
 {
-	// TODO
+	OPENFILENAMEA ofna;
+	char sz_file[100]{};
+	ZeroMemory(&ofna, sizeof(ofna));
+	ofna.lStructSize = sizeof(ofna);
+	ofna.hwndOwner = NULL;
+	ofna.lpstrFile = sz_file;
+	ofna.lpstrFile[0] = '\0';
+	ofna.nMaxFile = sizeof(sz_file);
+	ofna.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
+	ofna.nFilterIndex = 1;
+	ofna.lpstrFileTitle = NULL;
+	ofna.nMaxFileTitle = 0;
+	ofna.lpstrInitialDir = NULL;
+	ofna.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	BOOL ok = GetOpenFileNameA(&ofna);
+	if (ok)
+		return ofna.lpstrFile;
+	return "";
 }
 
-void save_canvas(vector<vector<string>>& canvas)
+/* Returns the file path, or an empty string if canceled. */
+string create_save_file()
 {
-	// TODO
+	OPENFILENAMEA ofna;
+	char sz_file[100]{};
+	ZeroMemory(&ofna, sizeof(ofna));
+	ofna.lStructSize = sizeof(ofna);
+	ofna.hwndOwner = NULL;
+	ofna.lpstrFile = sz_file;
+	ofna.lpstrFile[0] = '\0';
+	ofna.nMaxFile = sizeof(sz_file);
+	ofna.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
+	ofna.nFilterIndex = 1;
+	ofna.lpstrFileTitle = NULL;
+	ofna.nMaxFileTitle = 0;
+	ofna.lpstrInitialDir = NULL;
+	ofna.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	BOOL ok = GetSaveFileNameA(&ofna);
+	if (ok)
+		return ofna.lpstrFile;
+	return "";
+}
+
+/* Returns true if successful, false otherwise. */
+bool load_canvas(vector<vector<string>>& canvas)
+{
+	return false;  // TODO: fix encoding problem.
+	string file_path = choose_file_to_load();
+	if (file_path.empty())
+		return false;
+	ifstream file(file_path);
+	if (!file.is_open())
+	{
+		ynot::notify("Error: failed to open " + file_path);
+		return false;
+	}
+	vector<string> lines;
+	string line;
+	while (getline(file, line))
+		lines.push_back(line);
+	file.close();
+	size_t canvas_size = canvas.size();
+	if (lines.size() > canvas_size)
+	{
+		canvas.resize(lines.size());
+		for (size_t y = canvas_size; y < canvas.size(); y++)
+		{
+			canvas[y].resize(canvas[0].size() + 10);
+			for (size_t x = 0; x < canvas[y].size(); x++)
+				canvas[y][x] = " ";
+		}
+	}
+	size_t longest_line_length = 0;
+	for (const string& line : lines)
+	{
+		if (line.size() > longest_line_length)
+			longest_line_length = line.size();
+	}
+	if (longest_line_length > canvas[0].size())
+	{
+		size_t line_length = canvas[0].size();
+		for (size_t y = 0; y < canvas.size(); y++)
+		{
+			canvas[y].resize(longest_line_length);
+			for (size_t x = line_length; x < canvas[y].size(); x++)
+				canvas[y][x] = " ";
+		}
+	}
+	for (size_t y = 0; y < lines.size(); y++)
+	{
+		for (size_t x = 0; x < lines[y].size(); x++)
+			canvas[y][x] = lines[y][x];
+	}
+	return true;
+}
+
+/* Returns true if successful, false otherwise. */
+bool save_canvas(vector<vector<string>>& canvas)
+{
+	string file_path = create_save_file();
+	if (file_path.empty())
+		return false;
+	ofstream file(file_path);
+	if (!file.is_open())
+	{
+		ynot::notify("Error: failed to open " + file_path);
+		return false;
+	}
+	for (const vector<string>& line : canvas)
+	{
+		for (const string& ch_str : line)
+			file << ch_str;
+		file << "\n";
+	}
+	file.close();
+	return true;
 }
 
 void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size)
