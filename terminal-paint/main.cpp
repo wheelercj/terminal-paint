@@ -13,15 +13,15 @@ void validate_char_map();
 map<string, vector<string>> get_char_map();
 bool confirmed_dont_save();
 void show_help();
-bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& drawing_character, int& drawing_radius);
+bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& brush_character, int& brush_radius);
 vector<vector<string>> init_canvas(Coord window_size);
 void clear_canvas(vector<vector<string>>& canvas);
 void load_canvas(vector<vector<string>>& canvas, Coord window_size);
 void save_canvas(vector<vector<string>>& canvas);
 void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size);
-bool show_canvas_menu(string& drawing_character);
+bool show_canvas_menu(string& brush_character);
 void print_canvas_menu(const map<string, vector<string>>& char_map);
-bool show_char_menu(vector<string> char_options, string& drawing_character);
+bool show_char_menu(vector<string> char_options, string& brush_character);
 void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size);
 void error_exit(string message);
 void reset_terminal();
@@ -34,8 +34,8 @@ int main()
 	//ynot::Menu main_menu("terminal paint", { "paint", "load", "save", "clear", "help", "exit" });
 	Coord window_size = ynot::get_window_size();
 	vector<vector<string>> canvas = init_canvas(window_size);
-	int drawing_radius = 1;
-	string drawing_character = "█";
+	int brush_radius = 1;
+	string brush_character = "█";
 
 	string choice = "";
 	bool saved = true;
@@ -45,13 +45,13 @@ int main()
 		ynot::alternate_screen_buffer();
 		if (choice == "paint")
 		{
-			if (open_canvas(canvas, window_size, drawing_character, drawing_radius))
+			if (open_canvas(canvas, window_size, brush_character, brush_radius))
 				saved = false;
 		}
 		else if (choice == "load" && (saved || confirmed_dont_save()))
 		{
 			load_canvas(canvas, window_size);
-			if (open_canvas(canvas, window_size, drawing_character, drawing_radius))
+			if (open_canvas(canvas, window_size, brush_character, brush_radius))
 				saved = false;
 		}
 		else if (choice == "save")
@@ -134,8 +134,7 @@ void show_help()
 		terminal paint
 		
 		In the paint canvas:
-		• press tab to open the brush selection menu 
-		  and any other key to close it
+		• press tab to open or close the brush selection menu
 		• press escape to return to the main menu
 		• left click to draw and right click to erase
 		• use the number keys to control the brush radius
@@ -146,7 +145,7 @@ void show_help()
 }
 
 /* Returns true if the canvas changed, false otherwise. */
-bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& drawing_character, int& drawing_radius)
+bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& brush_character, int& brush_radius)
 {
 	print_entire_canvas(canvas, window_size);
 	bool canvas_changed = false;
@@ -194,11 +193,11 @@ bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& draw
 				switch (mer.dwButtonState)
 				{
 				case 1:
-					draw(drawing_character, coord, drawing_radius, canvas, window_size);
+					draw(brush_character, coord, brush_radius, canvas, window_size);
 					canvas_changed = true;
 					break;
 				case 2:
-					draw(" ", coord, drawing_radius, canvas, window_size);
+					draw(" ", coord, brush_radius, canvas, window_size);
 					canvas_changed = true;
 					break;
 				}
@@ -208,13 +207,14 @@ bool open_canvas(vector<vector<string>>& canvas, Coord window_size, string& draw
 				if (key == '\x1b')  // escape
 					return canvas_changed;
 				if (key >= '1' and key <= '9')
-					drawing_radius = key - '0';
+					brush_radius = key - '0';
 				else if (key == '\t')
 				{
-					if (!show_canvas_menu(drawing_character))
+					if (!show_canvas_menu(brush_character))
 						return canvas_changed;
 					ynot::clear_screen();
 					print_entire_canvas(canvas, window_size);
+					just_started = true;
 				}
 			}
 		}
@@ -263,7 +263,7 @@ void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size)
 }
 
 /* Returns true if returning to the canvas, false if returning to the main menu. */
-bool show_canvas_menu(string& drawing_character)
+bool show_canvas_menu(string& brush_character)
 {
 	map<string, vector<string>> char_map = get_char_map();
 	print_canvas_menu(char_map);
@@ -272,10 +272,12 @@ bool show_canvas_menu(string& drawing_character)
 		string key = ynot::get_key();
 		if (key == "escape")
 			return false;
+		if (key == "tab")
+			return true;
 		if (char_map.count(key) == 0)
 			continue;
 		else
-			if (show_char_menu(char_map[key], drawing_character))
+			if (show_char_menu(char_map[key], brush_character))
 				return true;
 			else
 				print_canvas_menu(char_map);
@@ -297,7 +299,7 @@ void print_canvas_menu(const map<string, vector<string>>& char_map)
 }
 
 /* Returns true if a new drawing character was chosen, false otherwise. */
-bool show_char_menu(vector<string> char_options, string& drawing_character)
+bool show_char_menu(vector<string> char_options, string& brush_character)
 {
 	ynot::clear_screen();
 	string selectors = "\x1b[4;42m";
@@ -320,20 +322,20 @@ bool show_char_menu(vector<string> char_options, string& drawing_character)
 		if (key == "")
 			continue;
 		if (key == "0")
-			drawing_character = ynot::get_key();
+			brush_character = ynot::get_key();
 		else if (key[0] > '0' && key[0] <= '9')
 		{
-			size_t index = size_t(key[0] - '1');
+			size_t index = size_t(key[0] - '0');
 			if (index >= char_options.size())
 				continue;
-			drawing_character = char_options[index];
+			brush_character = char_options[index];
 		}
 		else
 		{
-			size_t index = size_t(key[0] - 'a' + 9);
+			size_t index = size_t(key[0] - 'a' + 10);
 			if (index >= char_options.size())
 				continue;
-			drawing_character = char_options[index];
+			brush_character = char_options[index];
 		}
 		return true;
 	}
