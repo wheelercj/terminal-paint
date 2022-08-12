@@ -277,10 +277,19 @@ bool show_canvas_menu(string& brush_character)
 		if (char_map.count(key) == 0)
 			continue;
 		else
-			if (show_char_menu(char_map[key], brush_character))
+		{
+			if (key == "0")
+			{
+				ynot::clear_screen();
+				ynot::print_at(1, 1, "\n\n  Press a key to draw with");
+				brush_character = ynot::get_key();
+				return true;
+			}
+			else if (show_char_menu(char_map[key], brush_character))
 				return true;
 			else
 				print_canvas_menu(char_map);
+		}
 	}
 }
 
@@ -302,18 +311,19 @@ void print_canvas_menu(const map<string, vector<string>>& char_map)
 bool show_char_menu(vector<string> char_options, string& brush_character)
 {
 	ynot::clear_screen();
-	string selectors = "\x1b[4;42m";
-	int i = 0;
-	for (; i < char_options.size() && i < 9; i++)
-		selectors += " " + to_string(i + 1);
+	string text = "";
+	size_t i = 0;
+	for (; i < char_options.size() && i < 10; i++)
+		text += " \x1b[4;42m" + to_string(i) + ":\x1b[0m " + char_options[i];
 	for (; i < char_options.size(); i++)
 	{
-		selectors += " ";
-		selectors.push_back(char('a' + i - 9));
+		if (i % 10 == 0)
+			text += "\n";
+		text += " \x1b[4;42m";
+		text.push_back(char('a' + i - 10));
+		text += ":\x1b[0m " + char_options[i];
 	}
-	ynot::print_at(1, 1, selectors + " \x1b[0m\n");
-	for (const string& ch : char_options)
-		ynot::print(" " + ch);
+	ynot::print_at(1, 1, text);
 	while (true)
 	{
 		string key = ynot::get_key();
@@ -321,9 +331,7 @@ bool show_char_menu(vector<string> char_options, string& brush_character)
 			return false;
 		if (key == "")
 			continue;
-		if (key == "0")
-			brush_character = ynot::get_key();
-		else if (key[0] > '0' && key[0] <= '9')
+		else if (key[0] >= '0' && key[0] <= '9')
 		{
 			size_t index = size_t(key[0] - '0');
 			if (index >= char_options.size())
