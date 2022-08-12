@@ -351,12 +351,17 @@ bool show_char_menu(vector<string> char_options, string& brush_character)
 
 void draw(string output, COORD cursor_coord, int radius, vector<vector<string>>& canvas, Coord window_size)
 {
-	for (int x = cursor_coord.X - radius + 1; x <= cursor_coord.X + radius - 1; x++) {
-		for (int y = cursor_coord.Y - radius + 1; y <= cursor_coord.Y + radius - 1; y++) {
+	for (int x = cursor_coord.X - radius + 1; x <= cursor_coord.X + radius - 1; x++)
+	{
+		for (int y = cursor_coord.Y - radius + 1; y <= cursor_coord.Y + radius - 1; y++)
+		{
 			if (window_size.y > y && window_size.x > x && y >= 0 && x >= 0)
 			{
-				canvas[size_t(y) + 1][size_t(x) + 1] = output;
-				ynot::print_at(x + 1, y + 1, output);
+				if (output.size() <= 3 || x < window_size.x - 3)
+				{
+					canvas[size_t(y) + 1][size_t(x) + 1] = output;
+					ynot::print_at(x + 1, y + 1, output);
+				}
 			}
 		}
 	}
