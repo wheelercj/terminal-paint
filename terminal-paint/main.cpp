@@ -57,6 +57,7 @@ int main()
 		{
 			if (!load_canvas(canvas))
 				continue;
+			saved = true;
 			if (open_canvas(canvas, window_size, brush_character, brush_radius))
 				saved = false;
 		}
@@ -128,8 +129,6 @@ bool confirmed_dont_save(vector<vector<string>>& canvas)
 {
 	ynot::Menu confirmation_menu("Save changes?", { "save", "don't save", "cancel" });
 	string choice = confirmation_menu.run();
-	ynot::alternate_screen_buffer();
-	ynot::print_at(5, 5, "Saving . . .");
 	if (choice == "save")
 	{
 		if (!save_canvas(canvas))
@@ -367,9 +366,12 @@ bool load_canvas(vector<vector<string>>& canvas)
 /* Returns true if successful, false otherwise. */
 bool save_canvas(vector<vector<string>>& canvas)
 {
+	ynot::alternate_screen_buffer();
+	ynot::notify("Choose a file name.", false);
 	string file_path = create_save_file();
 	if (file_path.empty())
 		return false;
+	ynot::notify("Saving . . .", false);
 	ofstream file(file_path);
 	if (!file.is_open())
 	{
@@ -414,7 +416,7 @@ bool show_canvas_menu(string& brush_character)
 			if (key == "0")
 			{
 				ynot::clear_screen();
-				ynot::print_at(1, 1, "\n\n  Press a key to draw with");
+				ynot::notify("Press a key to draw with.", false);
 				brush_character = ynot::get_key();
 				return true;
 			}
