@@ -37,7 +37,6 @@ void App::run()
 			{
 				this->show_help();
 				havent_shown_help_yet = false;
-				ynot::alternate_screen_buffer();
 			}
 			bool canvas_changed = this->run_canvas();
 			if (canvas_changed)
@@ -120,6 +119,7 @@ void App::show_help()
 
 bool App::run_canvas()
 {
+	ynot::alternate_screen_buffer();
 	print_entire_canvas(this->canvas, this->window_size);
 	HANDLE handle = GetStdHandle(STD_INPUT_HANDLE);
 	DWORD previous_input_mode{};
@@ -214,9 +214,9 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 	else if (key == '\t')
 	{
 		bool resume = this->run_canvas_menu();
+		ynot::alternate_screen_buffer();
 		if (!resume)
 			return false;
-		ynot::clear_screen();
 		print_entire_canvas(this->canvas, this->window_size);
 		clear_input_buffer = true;
 	}
@@ -256,9 +256,9 @@ bool App::run_canvas_menu_loop()
 			continue;
 		if (key == "0")
 		{
-			ynot::clear_screen();
 			ynot::notify("Press a key to draw with.", false);
 			brush_character = ynot::get_key();
+			ynot::alternate_screen_buffer();
 			return true;
 		}
 		bool brush_character_changed = this->run_char_menu(this->char_map[key]);
