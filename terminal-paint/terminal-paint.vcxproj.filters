@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ynot">
+      <UniqueIdentifier>{6c7b8e4d-1b03-4589-8931-996cecb146cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\common.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\InputField.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\Menu.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\Paginator.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\str.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\terminal.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\Notification.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\encoding\utf8conv.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ynot\ynot\encoding\utf8except.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="files.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="canvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ynot\ynot\common.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\InputField.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\Menu.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\Paginator.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\str.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\terminal.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\ynot.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\Notification.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\encoding\utf8conv.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ynot\ynot\encoding\utf8except.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="files.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="canvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

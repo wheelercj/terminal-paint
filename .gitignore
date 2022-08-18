@@ -1,7 +1,4 @@
 Debug
 *.exe
-*.sln
-*.vcxproj
-*.filters
 *.user
 enc_temp_folder
