@@ -59,7 +59,7 @@ void draw(
 	}
 }
 
-bool load_canvas(vector<vector<string>>& canvas)
+bool load_canvas(vector<vector<string>>& canvas, Coord window_size)
 {
 	ynot::notify("Choose a .tpaint file to load.", false);
 	string file_path = choose_file_to_load();
@@ -69,11 +69,11 @@ bool load_canvas(vector<vector<string>>& canvas)
 	string content = load_file(file_path);
 	if (content.empty())
 		return false;
-	load_canvas(content, canvas);
+	load_canvas(content, canvas, window_size);
 	return true;
 }
 
-void load_canvas(string file_content, vector<vector<string>>& canvas)
+void load_canvas(string file_content, vector<vector<string>>& canvas, Coord window_size)
 {
 	vector<string> lines = ynot::split(file_content, "\n");
 	canvas.clear();
@@ -85,6 +85,37 @@ void load_canvas(string file_content, vector<vector<string>>& canvas)
 		for (size_t x = 0; x < canvas[y].size(); x++)
 			canvas[y][x] = pixels[x];
 	}
+	enlarge_canvas(canvas, window_size);
+}
+
+bool enlarge_canvas(vector<vector<string>>& canvas, Coord window_size)
+{
+	bool size_changed = false;
+	if (canvas.size() < window_size.y)
+	{
+		canvas.resize(window_size.y);
+		size_changed = true;
+	}
+	if (enlarge_rows(canvas, window_size.x))
+		size_changed = true;
+	return size_changed;
+}
+
+bool enlarge_rows(vector<vector<string>>& canvas, size_t target_row_size)
+{
+	bool size_changed = false;
+	for (vector<string>& row : canvas)
+	{
+		size_t row_size = row.size();
+		if (row_size < target_row_size)
+		{
+			row.resize(target_row_size);
+			size_changed = true;
+			for (size_t x = row_size; x < row.size(); x++)
+				row[x] = " ";
+		}
+	}
+	return size_changed;
 }
 
 bool save_canvas(vector<vector<string>>& canvas)

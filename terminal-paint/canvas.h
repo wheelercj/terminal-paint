@@ -12,11 +12,19 @@ void print_entire_canvas(std::vector<std::vector<std::string>>& canvas, Coord wi
 void draw(std::string output, COORD cursor_coord, int radius, std::vector<std::vector<std::string>>& canvas, Coord window_size);
 
 /* Returns true if successful, false otherwise. */
-bool load_canvas(std::vector<std::vector<std::string>>& canvas);
+bool load_canvas(std::vector<std::vector<std::string>>& canvas, Coord window_size);
 
 /* Copies a .tpaint file's content into the canvas.
    Assumes the file content has a valid format. */
-void load_canvas(std::string file_content, std::vector<std::vector<std::string>>& canvas);
+void load_canvas(std::string file_content, std::vector<std::vector<std::string>>& canvas, Coord window_size);
+
+/* Enlarges the canvas to match the window's size, filling empty parts with spaces.
+   Does nothing if the canvas is the same size or larger.
+   Returns true if the canvas and/or any rows changed size, false otherwise. */
+bool enlarge_canvas(std::vector<std::vector<std::string>>& canvas, Coord window_size);
+
+/* Returns true if one or more rows changed size, false otherwise. */
+bool enlarge_rows(std::vector<std::vector<std::string>>& canvas, size_t target_row_size);
 
 /* Returns true if successful, false otherwise. */
 bool save_canvas(std::vector<std::vector<std::string>>& canvas);

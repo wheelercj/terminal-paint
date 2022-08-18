@@ -45,7 +45,7 @@ void App::run()
 		}
 		else if (choice == "load" && (saved || this->confirmed_dont_save()))
 		{
-			if (!load_canvas(this->canvas))
+			if (!load_canvas(this->canvas, this->window_size))
 				continue;
 			saved = true;
 			bool canvas_changed = this->run_canvas();
@@ -163,15 +163,28 @@ bool App::run_canvas_loop(HANDLE handle, DWORD previous_input_mode)
 		{
 			switch (input_record_buffer[i].EventType)
 			{
-			case MOUSE_EVENT:
-				MOUSE_EVENT_RECORD mer = input_record_buffer[i].Event.MouseEvent;
-				this->on_canvas_mouse_event(mer, canvas_changed);
-				break;
-			case KEY_EVENT:
-				WCHAR key = input_record_buffer[i].Event.KeyEvent.uChar.UnicodeChar;
-				bool resume = this->on_canvas_key_event(key, clear_input_buffer);
-				if (!resume)
-					return canvas_changed;
+				case MOUSE_EVENT:
+				{
+					MOUSE_EVENT_RECORD mer = input_record_buffer[i].Event.MouseEvent;
+					this->on_canvas_mouse_event(mer, canvas_changed);
+					break;
+				}
+				case KEY_EVENT:
+				{
+					WCHAR key = input_record_buffer[i].Event.KeyEvent.uChar.UnicodeChar;
+					bool resume = this->on_canvas_key_event(key, clear_input_buffer);
+					if (!resume)
+						return canvas_changed;
+					break;
+				}
+				case WINDOW_BUFFER_SIZE_EVENT:
+				{
+					COORD new_window_size = input_record_buffer[i].Event.WindowBufferSizeEvent.dwSize;
+					this->window_size.x = new_window_size.X;
+					this->window_size.y = new_window_size.Y;
+					enlarge_canvas(canvas, window_size);
+					print_entire_canvas(canvas, window_size);
+				}
 			}
 		}
 	}
