@@ -4,21 +4,20 @@ Draw in the terminal using your mouse!
 
 ![demo](https://media.giphy.com/media/XAUcYQJnqrdlEYhhLE/giphy.gif)
 
+This app requires you to have the windows.h header file (normally only available in Windows).
+
 ## features
 
 * Left click to draw, right click to erase.
 * Draw with any Unicode symbol including emoji.
 * Save to and load from files.
 
-## requirements
+## download
 
-* The windows.h header file.
-* C++17 or newer. If you're using Visual Studio, you can choose the version of C++ with project > Properties > C/C++ > Language > C++ Language Standard.
-* Some features require using a modern terminal such as [Windows Terminal](https://aka.ms/terminal).
-
-## usage
-
-Make sure any of this app's files that have emoji or other high Unicode symbols in them are encoded with the [UTF-8 encoding](https://docs.microsoft.com/en-us/visualstudio/ide/how-to-save-and-open-files-with-encoding?view=vs-2022) (_without_ BOM/signature).
+1. Open a terminal where you want this app's folder to be.
+2. Use `git clone https://github.com/wheelercj/terminal-paint.git --recurse-submodules`
+3. Build the app from the code. If you have Visual Studio, you can simply open the .sln file and choose the build option.
+4. Run the app in a modern terminal such as [Windows Terminal](https://aka.ms/terminal). If you're using Windows 10, see [how to run your C++ app in Windows Terminal](https://wheelercj.github.io/notes/pages/20220506214620.html).
 
 ## how it works
 
