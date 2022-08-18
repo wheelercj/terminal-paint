@@ -209,7 +209,7 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 {
 	if (key == '\x1b')  // escape
 		return false;
-	if (key >= '1' and key <= '9')
+	if (key >= '1' && key <= '9')
 		this->brush_radius = key - '0';
 	else if (key == '\t')
 	{
