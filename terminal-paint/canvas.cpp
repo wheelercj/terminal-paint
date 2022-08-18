@@ -170,8 +170,7 @@ bool export_canvas(vector<vector<string>>& canvas)
 
 void error_exit(string message, HANDLE handle, DWORD previous_input_mode)
 {
-	ynot::print("Error: " + message);
-	ynot::sleep_(5000);
+	ynot::notify("Error: " + message);
 	reset_terminal(handle, previous_input_mode);
 	ExitProcess(0);
 }
