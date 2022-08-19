@@ -5,12 +5,12 @@ using namespace std;
 using ynot::CursorStyle;
 using ynot::Coord;
 
-App::App(string version, map<string, vector<string>> char_map)
+App::App(string version, map<string, vector<string>> brush_map)
 {
 	ynot::reset_on_keyboard_interrupt();
 	ynot::set_window_title("terminal paint");
 	this->version = version;
-	this->char_map = char_map;
+	this->brush_map = brush_map;
 	this->window_size = ynot::get_window_size();
 	this->canvas = create_canvas(this->window_size);
 	this->brush_character = "┼";
@@ -234,8 +234,8 @@ bool App::run_canvas_menu()
 void App::print_canvas_menu()
 {
 	ynot::clear_screen();
-	string canvas_menu_str = "To change the drawing character, choose a category:\n";
-	for (const auto& row : this->char_map)
+	string canvas_menu_str = "To change the brush character, choose a category:\n";
+	for (const auto& row : this->brush_map)
 	{
 		string row_str = "\x1b[42m" + row.first + "│\x1b[0m";
 		for (const string& cell : row.second)
@@ -254,7 +254,7 @@ bool App::run_canvas_menu_loop()
 			return false;
 		if (key == "tab")
 			return true;
-		if (this->char_map.count(key) == 0)
+		if (this->brush_map.count(key) == 0)
 			continue;
 		if (key == "0")
 		{
@@ -273,37 +273,37 @@ bool App::run_canvas_menu_loop()
 			this->brush_character = "╬";
 			return true;
 		}
-		bool brush_character_changed = this->run_char_menu(this->char_map[key]);
+		bool brush_character_changed = this->run_brush_menu(this->brush_map[key]);
 		if (brush_character_changed)
 			return true;
 	}
 }
 
-bool App::run_char_menu(const vector<string>& char_options)
+bool App::run_brush_menu(const vector<string>& brush_options)
 {
-	this->print_char_menu(char_options);
-	return this->run_char_menu_loop(char_options);
+	this->print_brush_menu(brush_options);
+	return this->run_brush_menu_loop(brush_options);
 }
 
-void App::print_char_menu(const vector<string>& char_options)
+void App::print_brush_menu(const vector<string>& brush_options)
 {
 	ynot::clear_screen();
 	string text = "";
 	size_t i = 0;
-	for (; i < char_options.size() && i < 10; i++)
-		text += " \x1b[4;42m" + to_string(i) + ":\x1b[0m " + char_options[i];
-	for (; i < char_options.size(); i++)
+	for (; i < brush_options.size() && i < 10; i++)
+		text += " \x1b[4;42m" + to_string(i) + ":\x1b[0m " + brush_options[i];
+	for (; i < brush_options.size(); i++)
 	{
 		if (i % 10 == 0)
 			text += "\n";
 		text += " \x1b[4;42m";
 		text.push_back(char('a' + i - 10));
-		text += ":\x1b[0m " + char_options[i];
+		text += ":\x1b[0m " + brush_options[i];
 	}
 	ynot::print_at(1, 1, text);
 }
 
-bool App::run_char_menu_loop(const vector<string>& char_options)
+bool App::run_brush_menu_loop(const vector<string>& brush_options)
 {
 	while (true)
 	{
@@ -315,16 +315,16 @@ bool App::run_char_menu_loop(const vector<string>& char_options)
 		else if (key[0] >= '0' && key[0] <= '9')
 		{
 			size_t index = size_t(key[0] - '0');
-			if (index >= char_options.size())
+			if (index >= brush_options.size())
 				continue;
-			this->brush_character = char_options[index];
+			this->brush_character = brush_options[index];
 		}
 		else
 		{
 			size_t index = size_t(key[0] - 'a' + 10);
-			if (index >= char_options.size())
+			if (index >= brush_options.size())
 				continue;
-			this->brush_character = char_options[index];
+			this->brush_character = brush_options[index];
 		}
 		return true;
 	}

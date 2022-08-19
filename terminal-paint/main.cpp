@@ -1,20 +1,20 @@
 #include "App.h"
 using namespace std;
 
-map<string, vector<string>> create_char_map();
-void validate_char_map(map<string, vector<string>> char_map);
+map<string, vector<string>> create_brush_map();
+void validate_brush_map(map<string, vector<string>> brush_map);
 
 int main()
 {
 	const string version = "v0.1.0";
-	map<string, vector<string>> char_map = create_char_map();
-	validate_char_map(char_map);
-	App app(version, char_map);
+	map<string, vector<string>> brush_map = create_brush_map();
+	validate_brush_map(brush_map);
+	App app(version, brush_map);
 	app.run();
 	return 0;
 }
 
-map<string, vector<string>> create_char_map()
+map<string, vector<string>> create_brush_map()
 {
 	// Some symbols might not render correctly here but still can in terminals.
 	return {
@@ -46,13 +46,13 @@ map<string, vector<string>> create_char_map()
 	};
 }
 
-void validate_char_map(map<string, vector<string>> char_map)
+void validate_brush_map(map<string, vector<string>> brush_map)
 {
-	if (char_map.size() > 36)
-		throw std::out_of_range("The char map must have <= 36 rows.");
-	for (const auto& row : char_map)
+	if (brush_map.size() > 36)
+		throw std::out_of_range("The brush map must have <= 36 rows.");
+	for (const auto& row : brush_map)
 	{
 		if (row.second.size() > 36)
-			throw std::out_of_range("Each row in the char map must have <= 36 elements.");
+			throw std::out_of_range("Each row in the brush map must have <= 36 elements.");
 	}
 }

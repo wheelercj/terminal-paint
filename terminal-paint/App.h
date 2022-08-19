@@ -7,7 +7,7 @@ class App
 {
 public:
 
-	App(std::string version, std::map<std::string, std::vector<std::string>> char_map);
+	App(std::string version, std::map<std::string, std::vector<std::string>> brush_map);
 	~App();
 	void run();
 
@@ -18,7 +18,7 @@ private:
 	std::vector<std::vector<std::string>> canvas;
 	std::string brush_character;
 	int brush_radius;
-	std::map<std::string, std::vector<std::string>> char_map;
+	std::map<std::string, std::vector<std::string>> brush_map;
 
 	bool confirmed_dont_save();
 
@@ -43,11 +43,11 @@ private:
 	/* Returns true if returning to the canvas, false if returning to the main menu. */
 	bool run_canvas_menu_loop();
 
-	/* Returns true if a new brush character was chosen, false otherwise. */
-	bool run_char_menu(const std::vector<std::string>& char_options);
+	/* Returns true if a new brush was chosen, false otherwise. */
+	bool run_brush_menu(const std::vector<std::string>& brush_options);
 
-	void print_char_menu(const std::vector<std::string>& char_options);
+	void print_brush_menu(const std::vector<std::string>& brush_options);
 
-	/* Returns true if a new brush character was chosen, false otherwise. */
-	bool run_char_menu_loop(const std::vector<std::string>& char_options);
+	/* Returns true if a new brush was chosen, false otherwise. */
+	bool run_brush_menu_loop(const std::vector<std::string>& brush_options);
 };
