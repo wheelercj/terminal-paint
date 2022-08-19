@@ -139,6 +139,7 @@
     <ClCompile Include="..\ynot\ynot\terminal.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="canvas.cpp" />
+    <ClCompile Include="draw.cpp" />
     <ClCompile Include="files.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -158,6 +159,7 @@
     <ClInclude Include="..\ynot\ynot\ynot.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="canvas.h" />
+    <ClInclude Include="draw.h" />
     <ClInclude Include="files.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

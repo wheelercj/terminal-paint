@@ -1,4 +1,5 @@
 #include "App.h"
+#include "draw.h"
 #include <fstream>
 using namespace std;
 using ynot::CursorStyle;
