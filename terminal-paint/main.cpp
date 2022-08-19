@@ -6,9 +6,10 @@ void validate_char_map(map<string, vector<string>> char_map);
 
 int main()
 {
+	const string version = "v0.1.0";
 	map<string, vector<string>> char_map = create_char_map();
 	validate_char_map(char_map);
-	App app(char_map);
+	App app(version, char_map);
 	app.run();
 	return 0;
 }

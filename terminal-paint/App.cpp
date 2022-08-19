@@ -5,10 +5,11 @@ using namespace std;
 using ynot::CursorStyle;
 using ynot::Coord;
 
-App::App(map<string, vector<string>> char_map)
+App::App(string version, map<string, vector<string>> char_map)
 {
 	ynot::reset_on_keyboard_interrupt();
 	ynot::set_window_title("terminal paint");
+	this->version = version;
 	this->char_map = char_map;
 	this->window_size = ynot::get_window_size();
 	this->canvas = create_canvas(this->window_size);
@@ -98,8 +99,8 @@ bool App::confirmed_dont_save()
 
 void App::show_help()
 {
-	ynot::notify(R"(
-		terminal paint
+	ynot::notify(
+		"\t\tterminal paint\n\t\t" + this->version + R"help_menu(
 		
 		In the paint canvas:
 		• left click to draw and right click to erase
@@ -115,7 +116,7 @@ void App::show_help()
 
 		For more help, join the discussions at
 		https://github.com/wheelercj/terminal-paint/discussions
-		)");
+		)help_menu");
 }
 
 bool App::run_canvas()

@@ -7,12 +7,13 @@ class App
 {
 public:
 
-	App(std::map<std::string, std::vector<std::string>> char_map);
+	App(std::string version, std::map<std::string, std::vector<std::string>> char_map);
 	~App();
 	void run();
 
 private:
 
+	std::string version;
 	Coord window_size;
 	std::vector<std::vector<std::string>> canvas;
 	std::string brush_character;
