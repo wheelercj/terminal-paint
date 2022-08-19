@@ -52,7 +52,11 @@ bool load_canvas(vector<vector<string>>& canvas, Coord window_size)
 
 void load_canvas(string file_content, vector<vector<string>>& canvas, Coord window_size)
 {
-	vector<string> lines = ynot::split(file_content, "\n");
+	vector<string> lines;
+	if (ynot::contains(file_content, "\r\n"))
+		lines = ynot::split(file_content, "\r\n");
+	else
+		lines = ynot::split(file_content, "\n");
 	canvas.clear();
 	canvas.resize(lines.size());
 	for (size_t y = 0; y < canvas.size(); y++)
