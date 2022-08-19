@@ -49,7 +49,7 @@ void draw(
 		{
 			if (window_size.y > y && window_size.x > x && y >= 0 && x >= 0)
 			{
-				if (output.size() <= 3 || x < window_size.x - 3)
+				if (output.size() == 1 || x < window_size.x - 3)
 				{
 					canvas[size_t(y) + 1][size_t(x) + 1] = output;
 					ynot::print_at(x + 1, y + 1, output);
