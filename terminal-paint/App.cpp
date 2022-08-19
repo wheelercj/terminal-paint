@@ -12,7 +12,7 @@ App::App(map<string, vector<string>> char_map)
 	this->char_map = char_map;
 	this->window_size = ynot::get_window_size();
 	this->canvas = create_canvas(this->window_size);
-	this->brush_character = "█";
+	this->brush_character = "┼";
 	this->brush_radius = 1;
 }
 
@@ -258,8 +258,18 @@ bool App::run_canvas_menu_loop()
 		if (key == "0")
 		{
 			ynot::notify("Press a key to draw with.", false);
-			brush_character = ynot::get_key();
+			this->brush_character = ynot::get_key();
 			ynot::alternate_screen_buffer();
+			return true;
+		}
+		if (key == "1")
+		{
+			this->brush_character = "┼";
+			return true;
+		}
+		if (key == "2")
+		{
+			this->brush_character = "╬";
 			return true;
 		}
 		bool brush_character_changed = this->run_char_menu(this->char_map[key]);
