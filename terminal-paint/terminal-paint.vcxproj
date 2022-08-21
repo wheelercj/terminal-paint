@@ -128,9 +128,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ynot\ynot\utf8conv.cpp" />
+    <ClCompile Include="..\..\ynot\ynot\utf8except.cpp" />
     <ClCompile Include="..\ynot\ynot\common.cpp" />
-    <ClCompile Include="..\ynot\ynot\encoding\utf8conv.cpp" />
-    <ClCompile Include="..\ynot\ynot\encoding\utf8except.cpp" />
     <ClCompile Include="..\ynot\ynot\InputField.cpp" />
     <ClCompile Include="..\ynot\ynot\Menu.cpp" />
     <ClCompile Include="..\ynot\ynot\Notification.cpp" />
@@ -147,9 +147,9 @@
     <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ynot\ynot\utf8conv.h" />
+    <ClInclude Include="..\..\ynot\ynot\utf8except.h" />
     <ClInclude Include="..\ynot\ynot\common.h" />
-    <ClInclude Include="..\ynot\ynot\encoding\utf8conv.h" />
-    <ClInclude Include="..\ynot\ynot\encoding\utf8except.h" />
     <ClInclude Include="..\ynot\ynot\InputField.h" />
     <ClInclude Include="..\ynot\ynot\Menu.h" />
     <ClInclude Include="..\ynot\ynot\Notification.h" />

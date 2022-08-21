@@ -42,12 +42,6 @@
     <ClCompile Include="..\ynot\ynot\Notification.cpp">
       <Filter>ynot</Filter>
     </ClCompile>
-    <ClCompile Include="..\ynot\ynot\encoding\utf8conv.cpp">
-      <Filter>ynot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ynot\ynot\encoding\utf8except.cpp">
-      <Filter>ynot</Filter>
-    </ClCompile>
     <ClCompile Include="files.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="draw.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ynot\ynot\utf8conv.cpp">
+      <Filter>ynot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ynot\ynot\utf8except.cpp">
+      <Filter>ynot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,12 +89,6 @@
     <ClInclude Include="..\ynot\ynot\Notification.h">
       <Filter>ynot</Filter>
     </ClInclude>
-    <ClInclude Include="..\ynot\ynot\encoding\utf8conv.h">
-      <Filter>ynot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ynot\ynot\encoding\utf8except.h">
-      <Filter>ynot</Filter>
-    </ClInclude>
     <ClInclude Include="files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -106,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="draw.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ynot\ynot\utf8conv.h">
+      <Filter>ynot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ynot\ynot\utf8except.h">
+      <Filter>ynot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
