@@ -132,7 +132,7 @@ void App::show_help()
 bool App::run_canvas()
 {
 	ynot::alternate_screen_buffer();
-	print_entire_canvas(this->canvas, this->window_size);
+	print_entire_canvas(this->canvas, this->brush, this->window_size);
 	HANDLE handle = GetStdHandle(STD_INPUT_HANDLE);
 	DWORD previous_input_mode{};
 	if (handle == INVALID_HANDLE_VALUE)
@@ -195,7 +195,7 @@ bool App::run_canvas_loop(HANDLE handle, DWORD previous_input_mode)
 					this->window_size.x = new_window_size.X;
 					this->window_size.y = new_window_size.Y;
 					enlarge_canvas(this->canvas, this->window_size);
-					print_entire_canvas(this->canvas, this->window_size);
+					print_entire_canvas(this->canvas, this->brush, this->window_size);
 				}
 			}
 		}
@@ -223,7 +223,10 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 	if (key == '\x1b')  // escape
 		return false;
 	if (key >= '1' && key <= '9')
+	{
 		this->brush.radius = key - '0';
+		ynot::print_at(17, 1, "\x1b[48;5;28m" + to_string(this->brush.radius) + "\x1b[49m");
+	}
 	else if (key == '\t')
 	{
 		update_window_size();
@@ -232,7 +235,7 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 		if (!resume)
 			return false;
 		update_window_size();
-		print_entire_canvas(this->canvas, this->window_size);
+		print_entire_canvas(this->canvas, this->brush, this->window_size);
 		clear_input_buffer = true;
 	}
 	else if (key == ' ')
@@ -240,7 +243,7 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 		update_window_size();
 		this->run_color_menu();
 		update_window_size();
-		print_entire_canvas(this->canvas, this->window_size);
+		print_entire_canvas(this->canvas, this->brush, this->window_size);
 		clear_input_buffer = true;
 	}
 	return true;
@@ -376,6 +379,7 @@ void App::run_color_menu()
 		if (color_number_s == "0")
 			return;
 		this->brush.color += "\x1b[38;5;" + color_number_s + "m";
+		this->brush.fg_color = atoi(color_number_s.c_str());
 	}
 	else
 	{
@@ -384,6 +388,7 @@ void App::run_color_menu()
 		if (color_number_s == "0")
 			return;
 		this->brush.color.append("\x1b[48;5;" + color_number_s + "m");
+		this->brush.bg_color = atoi(color_number_s.c_str());
 	}
 }
 

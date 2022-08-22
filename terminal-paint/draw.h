@@ -9,8 +9,10 @@ using ynot::Coord;
 struct Brush
 {
 	std::string symbol;
-	std::string color;  // an ANSI escape sequence if there is a color
 	int radius;
+	std::string color;  // an ANSI escape sequence if there is a color
+	int fg_color;  // the color number that will replace # in \x1b[38;5;#m
+	int bg_color;  // the color number that will replace # in \x1b[48;5;#m
 
 	Brush(std::string symbol = "┼", std::string color = "", int radius = 1)
 	{
@@ -44,21 +46,6 @@ struct Pixel
 		this->symbol = symbol;
 		this->color = color;
 	}
-
-	/*void set(std::string str)
-	{
-		std::regex pattern("(?<color>(?:\x1b\\[\\d+(?:;\\d+)*m)+)(?<symbol>.+)");
-		std::smatch match;
-		if (std::regex_match(str, match, pattern))
-		{
-			this->color = match[1];
-			this->symbol = match[2];
-			if (ynot::endswith(this->symbol, "\x1b[0m"))
-				this->symbol = ynot::slice(this->symbol, 0, -4);
-		}
-		else
-			this->symbol = str;
-	}*/
 	
 	std::string get()
 	{

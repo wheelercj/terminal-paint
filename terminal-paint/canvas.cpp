@@ -23,14 +23,32 @@ void clear_canvas(vector<vector<Pixel>>& canvas)
 	}
 }
 
-void print_entire_canvas(vector<vector<Pixel>>& canvas, Coord window_size)
+void print_entire_canvas(vector<vector<Pixel>>& canvas, Brush brush, Coord window_size)
 {
 	ynot::clear_screen();
-	for (int y = 0; y < window_size.y && y < canvas.size(); y++)
+	print_brush_info_line(brush, window_size);
+	for (int y = 2; y < window_size.y && y < canvas.size(); y++)
 	{
-		for (int x = 0; x < window_size.x && x < canvas[y].size(); x++)
+		for (int x = 2; x < window_size.x && x < canvas[y].size(); x++)
 			ynot::print_at(x, y, canvas[y][x].get());
 	}
+}
+
+void print_brush_info_line(Brush brush, Coord window_size)
+{
+	ynot::set_cursor_coords(1, 1);
+	ynot::print(" \x1b[48;5;22m");
+	string r = to_string(brush.radius);
+	ynot::print(" brush radius:\x1b[48;5;28m " + r + " \x1b[48;5;22m");
+	ynot::print(" symbol:\x1b[48;5;28m " + brush.symbol + " \x1b[48;5;22m");
+	string fgc = to_string(brush.fg_color);
+	ynot::print(" fg color:\x1b[48;5;" + fgc + "m " + fgc + " \x1b[48;5;22m");
+	string bgc = to_string(brush.bg_color);
+	ynot::print(" bg color:\x1b[48;5;" + bgc + "m " + bgc + " \x1b[48;5;22m");
+	Coord c = ynot::get_cursor_coords();
+	for (int i = c.x; i < window_size.x - 3; i++)
+		ynot::print(" ");
+	ynot::print("\x1b[49m");
 }
 
 bool load_canvas(vector<vector<Pixel>>& canvas, Coord window_size)

@@ -8,7 +8,9 @@ std::vector<std::vector<Pixel>> create_canvas(Coord window_size);
 
 void clear_canvas(std::vector<std::vector<Pixel>>& canvas);
 
-void print_entire_canvas(std::vector<std::vector<Pixel>>& canvas, Coord window_size);
+void print_entire_canvas(std::vector<std::vector<Pixel>>& canvas, Brush brush, Coord window_size);
+
+void print_brush_info_line(Brush brush, Coord window_size);
 
 /* Returns true if successful, false otherwise. */
 bool load_canvas(std::vector<std::vector<Pixel>>& canvas, Coord window_size);
