@@ -21,6 +21,10 @@ private:
 
 	bool confirmed_dont_save();
 
+	/* Checks whether the window size changed and updates if necessary.
+	   Returns true if the window size changed, false otherwise. */
+	bool update_window_size();
+
 	void show_help();
 
 	/* Returns true if the canvas changed, false otherwise. */

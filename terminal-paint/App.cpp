@@ -30,6 +30,7 @@ void App::run()
 	while (choice != "exit" || (!saved && !this->confirmed_dont_save()))
 	{
 		choice = main_menu.run();
+		update_window_size();
 		if (choice == "paint")
 		{
 			if (havent_shown_help_yet)
@@ -92,6 +93,17 @@ bool App::confirmed_dont_save()
 		exit(0);
 	}
 	return choice == "don't save";
+}
+
+bool App::update_window_size()
+{
+	Coord temp_window_size = ynot::get_window_size();
+	if (temp_window_size != this->window_size)
+	{
+		this->window_size = temp_window_size;
+		return true;
+	}
+	return false;
 }
 
 void App::show_help()
@@ -214,16 +226,20 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 		this->brush.radius = key - '0';
 	else if (key == '\t')
 	{
+		update_window_size();
 		bool resume = this->run_brush_menu();
 		ynot::alternate_screen_buffer();
 		if (!resume)
 			return false;
+		update_window_size();
 		print_entire_canvas(this->canvas, this->window_size);
 		clear_input_buffer = true;
 	}
 	else if (key == ' ')
 	{
+		update_window_size();
 		this->run_color_menu();
+		update_window_size();
 		print_entire_canvas(this->canvas, this->window_size);
 		clear_input_buffer = true;
 	}
@@ -240,12 +256,16 @@ void App::print_brush_menu()
 {
 	ynot::clear_screen();
 	string canvas_menu_str = "Press tab to return or choose a category to change the brush:\n";
+	int i = 0;
 	for (const auto& row : this->brush_map)
 	{
+		if (i >= this->window_size.y - 5)
+			break;
 		string row_str = "\x1b[42m" + row.first + "│\x1b[0m";
 		for (const string& cell : row.second)
 			row_str += cell;
 		canvas_menu_str += row_str + "\n";
+		i++;
 	}
 	ynot::print_at(1, 1, canvas_menu_str);
 }
