@@ -6,7 +6,7 @@ void validate_brush_map(map<string, vector<string>> brush_map);
 
 int main()
 {
-	const string version = "v0.1.0";
+	const string version = "v0.2.0";
 	map<string, vector<string>> brush_map = create_brush_map();
 	validate_brush_map(brush_map);
 	App app(version, brush_map);
