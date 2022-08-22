@@ -118,12 +118,6 @@ void App::show_help()
 		• press space to open the color menu
 		• press escape to return to the main menu
 		
-		You can export using the export option in the main menu or
-		with shift & drag to select part of the screen and ctrl+c
-		to copy. Exporting emoji may have unpredictable results; it
-		helps to not have 3 or more emoji on the same line next
-		to each other, and redrawing emoji can fix some issues.
-
 		For more help, join the discussions at
 		https://github.com/wheelercj/terminal-paint/discussions
 		)help_menu");
