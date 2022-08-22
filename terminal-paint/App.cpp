@@ -256,7 +256,7 @@ void App::print_brush_menu()
 	int i = 0;
 	for (const auto& row : this->brush_map)
 	{
-		if (i >= this->window_size.y - 5)
+		if (i >= this->window_size.y - 3)
 			break;
 		string row_str = "\x1b[42m" + row.first + "│\x1b[0m";
 		for (const string& cell : row.second)
