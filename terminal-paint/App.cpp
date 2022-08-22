@@ -372,18 +372,16 @@ void App::run_color_menu()
 	{
 		regex fg_pattern("\x1b\\[38;5;\\d{1,3}m");
 		this->brush.color = regex_replace(this->brush.color, fg_pattern, "");
-		if (color_number_s == "0")
-			return;
-		this->brush.color += "\x1b[38;5;" + color_number_s + "m";
+		if (color_number_s != "0")
+			this->brush.color += "\x1b[38;5;" + color_number_s + "m";
 		this->brush.fg_color = atoi(color_number_s.c_str());
 	}
 	else
 	{
 		regex bg_pattern("\x1b\\[48;5;\\d{1,3}m");
 		this->brush.color = regex_replace(this->brush.color, bg_pattern, "");
-		if (color_number_s == "0")
-			return;
-		this->brush.color.append("\x1b[48;5;" + color_number_s + "m");
+		if (color_number_s != "0")
+			this->brush.color.append("\x1b[48;5;" + color_number_s + "m");
 		this->brush.bg_color = atoi(color_number_s.c_str());
 	}
 }
