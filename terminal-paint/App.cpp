@@ -298,6 +298,8 @@ bool App::run_brush_menu_loop()
 		bool brush_character_changed = this->run_brush_menu(this->brush_map[key]);
 		if (brush_character_changed)
 			return true;
+		else
+			print_brush_menu();
 	}
 }
 
