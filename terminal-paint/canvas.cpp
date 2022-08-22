@@ -5,38 +5,35 @@
 using ynot::CursorStyle;
 using namespace std;
 
-vector<vector<string>> create_canvas(Coord window_size)
+vector<vector<Pixel>> create_canvas(Coord window_size)
 {
-	vector<vector<string>> canvas;
+	vector<vector<Pixel>> canvas;
 	canvas.resize(size_t(window_size.y + 10));
 	for (size_t y = 0; y < canvas.size(); y++)
-	{
 		canvas[y].resize(size_t(window_size.x + 10));
-		for (size_t x = 0; x < canvas[y].size(); x++)
-			canvas[y][x] = " ";
-	}
 	return canvas;
 }
 
-void clear_canvas(vector<vector<string>>& canvas)
+void clear_canvas(vector<vector<Pixel>>& canvas)
 {
 	for (size_t y = 0; y < canvas.size(); y++)
 	{
 		for (size_t x = 0; x < canvas[y].size(); x++)
-			canvas[y][x] = " ";
+			canvas[y][x].set(" ", "");
 	}
 }
 
-void print_entire_canvas(vector<vector<string>>& canvas, Coord window_size)
+void print_entire_canvas(vector<vector<Pixel>>& canvas, Coord window_size)
 {
-	for (int y = 0; y <= window_size.y && y < canvas.size(); y++)
+	ynot::clear_screen();
+	for (int y = 0; y < window_size.y && y < canvas.size(); y++)
 	{
-		for (int x = 0; x <= window_size.x && x < canvas[y].size(); x++)
-			ynot::print_at(x, y, canvas[y][x]);
+		for (int x = 0; x < window_size.x && x < canvas[y].size(); x++)
+			ynot::print_at(x, y, canvas[y][x].get());
 	}
 }
 
-bool load_canvas(vector<vector<string>>& canvas, Coord window_size)
+bool load_canvas(vector<vector<Pixel>>& canvas, Coord window_size)
 {
 	ynot::notify("Choose a .tpaint file to load.", false);
 	string file_path = choose_file_to_load();
@@ -50,7 +47,7 @@ bool load_canvas(vector<vector<string>>& canvas, Coord window_size)
 	return true;
 }
 
-void load_canvas(string file_content, vector<vector<string>>& canvas, Coord window_size)
+void load_canvas(string file_content, vector<vector<Pixel>>& canvas, Coord window_size)
 {
 	vector<string> lines;
 	if (ynot::contains(file_content, "\r\n"))
@@ -61,15 +58,25 @@ void load_canvas(string file_content, vector<vector<string>>& canvas, Coord wind
 	canvas.resize(lines.size());
 	for (size_t y = 0; y < canvas.size(); y++)
 	{
-		vector<string> pixels = ynot::split(lines[y], "␝");
-		canvas[y].resize(pixels.size());
+		vector<string> pixel_strs = ynot::split(lines[y], "␝");
+		canvas[y].resize(pixel_strs.size());
 		for (size_t x = 0; x < canvas[y].size(); x++)
-			canvas[y][x] = pixels[x];
+		{
+			const string& pixel_str = pixel_strs[x];
+			Pixel& pixel = canvas[y][x];
+			if (ynot::contains(pixel_str, "␞"))
+			{
+				vector<string> color_and_symbol = ynot::split(pixel_str, "␞");
+				pixel.set(color_and_symbol[1], color_and_symbol[0]);
+			}
+			else
+				pixel.set(pixel_str, "");
+		}
 	}
 	enlarge_canvas(canvas, window_size);
 }
 
-bool enlarge_canvas(vector<vector<string>>& canvas, Coord window_size)
+bool enlarge_canvas(vector<vector<Pixel>>& canvas, Coord window_size)
 {
 	bool size_changed = false;
 	if (canvas.size() < window_size.y)
@@ -82,24 +89,22 @@ bool enlarge_canvas(vector<vector<string>>& canvas, Coord window_size)
 	return size_changed;
 }
 
-bool enlarge_rows(vector<vector<string>>& canvas, size_t target_row_size)
+bool enlarge_rows(vector<vector<Pixel>>& canvas, size_t target_row_size)
 {
 	bool size_changed = false;
-	for (vector<string>& row : canvas)
+	for (vector<Pixel>& row : canvas)
 	{
 		size_t row_size = row.size();
 		if (row_size < target_row_size)
 		{
 			row.resize(target_row_size);
 			size_changed = true;
-			for (size_t x = row_size; x < row.size(); x++)
-				row[x] = " ";
 		}
 	}
 	return size_changed;
 }
 
-bool save_canvas(vector<vector<string>>& canvas)
+bool save_canvas(vector<vector<Pixel>>& canvas)
 {
 	ynot::notify("Choose a file name.", false);
 	string file_path = create_save_file();
@@ -109,14 +114,17 @@ bool save_canvas(vector<vector<string>>& canvas)
 	ofstream file(file_path);
 	if (!file.is_open())
 	{
-		ynot::notify("Error: failed to open " + file_path);
+		ynot::notify("\aError: failed to open " + file_path);
 		return false;
 	}
-	for (const vector<string>& line : canvas)
+	for (vector<Pixel>& line : canvas)
 	{
 		for (size_t i = 0; i < line.size(); i++)
 		{
-			file << line[i];
+			Pixel& pixel = line[i];
+			if (pixel.color.size())
+				file << pixel.color << "␞";
+			file << pixel.symbol;
 			if (i < line.size() - 1)
 				file << "␝";
 		}
@@ -126,8 +134,12 @@ bool save_canvas(vector<vector<string>>& canvas)
 	return true;
 }
 
-bool export_canvas(vector<vector<string>>& canvas)
+bool export_canvas(vector<vector<Pixel>>& canvas)
 {
+	bool using_colors = detect_color(canvas);
+	bool export_colors = false;
+	if (using_colors && "yes" == ynot::Menu("Export color codes?", { "yes", "no" }).run())
+		export_colors = true;
 	ynot::notify("Choose a file name.", false);
 	string file_path = create_export_file();
 	if (file_path.empty())
@@ -136,22 +148,40 @@ bool export_canvas(vector<vector<string>>& canvas)
 	ofstream file(file_path);
 	if (!file.is_open())
 	{
-		ynot::notify("Error: failed to open " + file_path);
+		ynot::notify("\aError: failed to open " + file_path);
 		return false;
 	}
-	for (const vector<string>& line : canvas)
+	for (vector<Pixel>& line : canvas)
 	{
-		for (const string& ch_str : line)
-			file << ch_str;
+		for (Pixel& pixel : line)
+		{
+			if (export_colors)
+				file << pixel.get();
+			else
+				file << pixel.symbol;
+		}
 		file << "\n";
 	}
 	file.close();
 	return true;
 }
 
+bool detect_color(vector<vector<Pixel>>& canvas)
+{
+	for (vector<Pixel>& line : canvas)
+	{
+		for (Pixel& pixel : line)
+		{
+			if (pixel.color.size())
+				return true;
+		}
+	}
+	return false;
+}
+
 void error_exit(string message, HANDLE handle, DWORD previous_input_mode)
 {
-	ynot::notify("Error: " + message);
+	ynot::notify("\aError: " + message);
 	reset_terminal(handle, previous_input_mode);
 	ExitProcess(0);
 }

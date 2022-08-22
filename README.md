@@ -4,7 +4,7 @@ Draw in the terminal using your mouse!
 
 ![demo](https://media.giphy.com/media/XAUcYQJnqrdlEYhhLE/giphy.gif)
 
-This app requires you to have the windows.h header file (normally only available in Windows).
+This app requires the windows.h header file which is normally only available in Windows.
 
 ## features
 
@@ -21,4 +21,4 @@ This app requires you to have the windows.h header file (normally only available
 
 ## how it works
 
-This app's menus were created with the [ynot library](https://github.com/wheelercj/ynot), and the drawing feature itself was built with [Microsoft's console API](https://docs.microsoft.com/en-us/windows/console/reading-input-buffer-events).
+This app's menus were created with the [ynot library](https://github.com/wheelercj/ynot), and the drawing feature itself was mostly built with [Microsoft's console API](https://docs.microsoft.com/en-us/windows/console/reading-input-buffer-events).

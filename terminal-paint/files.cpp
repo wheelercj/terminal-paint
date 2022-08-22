@@ -15,7 +15,7 @@ string load_file(string file_path)
 	);
 	if (file_handle == INVALID_HANDLE_VALUE)
 	{
-		ynot::notify("Error: failed to open the file.");
+		ynot::notify("\aError: failed to open the file.");
 		return "";
 	}
 	DWORD file_size = GetFileSize(file_handle, 0);
@@ -26,7 +26,7 @@ string load_file(string file_path)
 	CloseHandle(file_handle);
 	if (!ok || bytes_read == 0 || !ynot::contains(content, "␝"))
 	{
-		ynot::notify("Error: opened but failed to read the file.");
+		ynot::notify("\aError: opened but failed to read the file.");
 		return "";
 	}
 	return content;
@@ -57,7 +57,7 @@ string choose_file_to_load()
 			return "";
 		else if (!ynot::endswith(file_path, ".tpaint"))
 		{
-			ynot::notify("Error: the file extension must be .tpaint");
+			ynot::notify("\aError: the file extension must be .tpaint");
 			ynot::notify("Choose a .tpaint file to load.", false);
 		}
 		else
@@ -92,7 +92,7 @@ string create_save_file()
 		}
 		else if (!ynot::endswith(file_path, ".tpaint"))
 		{
-			ynot::notify("Error: the file extension must be .tpaint");
+			ynot::notify("\aError: the file extension must be .tpaint");
 			ynot::notify("Choose a file name.", false);
 		}
 		else

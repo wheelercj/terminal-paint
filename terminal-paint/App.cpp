@@ -1,5 +1,4 @@
 #include "App.h"
-#include "draw.h"
 #include <fstream>
 using namespace std;
 using ynot::CursorStyle;
@@ -13,8 +12,6 @@ App::App(string version, map<string, vector<string>> brush_map)
 	this->brush_map = brush_map;
 	this->window_size = ynot::get_window_size();
 	this->canvas = create_canvas(this->window_size);
-	this->brush_character = "┼";
-	this->brush_radius = 1;
 }
 
 App::~App()
@@ -105,7 +102,8 @@ void App::show_help()
 		In the paint canvas:
 		• left click to draw and right click to erase
 		• use the number keys to control the brush radius
-		• press tab to open or close the brush selection menu
+		• press tab to open the brush symbol menu
+		• press space to open the color menu
 		• press escape to return to the main menu
 		
 		You can export using the export option in the main menu or
@@ -184,8 +182,8 @@ bool App::run_canvas_loop(HANDLE handle, DWORD previous_input_mode)
 					COORD new_window_size = input_record_buffer[i].Event.WindowBufferSizeEvent.dwSize;
 					this->window_size.x = new_window_size.X;
 					this->window_size.y = new_window_size.Y;
-					enlarge_canvas(canvas, window_size);
-					print_entire_canvas(canvas, window_size);
+					enlarge_canvas(this->canvas, this->window_size);
+					print_entire_canvas(this->canvas, this->window_size);
 				}
 			}
 		}
@@ -198,11 +196,12 @@ void App::on_canvas_mouse_event(MOUSE_EVENT_RECORD mer, bool& canvas_changed)
 	switch (mer.dwButtonState)
 	{
 	case 1:  // left click
-		draw(this->brush_character, coord, this->brush_radius, this->canvas, this->window_size);
+		draw(this->brush, coord, this->canvas, this->window_size);
 		canvas_changed = true;
 		break;
 	case 2:  // right click
-		draw(" ", coord, this->brush_radius, this->canvas, this->window_size);
+		Brush eraser(" ", "", this->brush.radius);
+		draw(eraser, coord, this->canvas, this->window_size);
 		canvas_changed = true;
 	}
 }
@@ -212,29 +211,35 @@ bool App::on_canvas_key_event(WCHAR key, bool& clear_input_buffer)
 	if (key == '\x1b')  // escape
 		return false;
 	if (key >= '1' && key <= '9')
-		this->brush_radius = key - '0';
+		this->brush.radius = key - '0';
 	else if (key == '\t')
 	{
-		bool resume = this->run_canvas_menu();
+		bool resume = this->run_brush_menu();
 		ynot::alternate_screen_buffer();
 		if (!resume)
 			return false;
 		print_entire_canvas(this->canvas, this->window_size);
 		clear_input_buffer = true;
 	}
+	else if (key == ' ')
+	{
+		this->run_color_menu();
+		print_entire_canvas(this->canvas, this->window_size);
+		clear_input_buffer = true;
+	}
 	return true;
 }
 
-bool App::run_canvas_menu()
+bool App::run_brush_menu()
 {
-	this->print_canvas_menu();
-	return this->run_canvas_menu_loop();
+	this->print_brush_menu();
+	return this->run_brush_menu_loop();
 }
 
-void App::print_canvas_menu()
+void App::print_brush_menu()
 {
 	ynot::clear_screen();
-	string canvas_menu_str = "To change the brush character, choose a category:\n";
+	string canvas_menu_str = "Press tab to return or choose a category to change the brush:\n";
 	for (const auto& row : this->brush_map)
 	{
 		string row_str = "\x1b[42m" + row.first + "│\x1b[0m";
@@ -245,7 +250,7 @@ void App::print_canvas_menu()
 	ynot::print_at(1, 1, canvas_menu_str);
 }
 
-bool App::run_canvas_menu_loop()
+bool App::run_brush_menu_loop()
 {
 	while (true)
 	{
@@ -259,18 +264,18 @@ bool App::run_canvas_menu_loop()
 		if (key == "0")
 		{
 			ynot::notify("Press a key to draw with.", false);
-			this->brush_character = ynot::get_key();
+			this->brush.symbol = ynot::get_key();
 			ynot::alternate_screen_buffer();
 			return true;
 		}
 		if (key == "1")
 		{
-			this->brush_character = "┼";
+			this->brush.symbol = "┼";
 			return true;
 		}
 		if (key == "2")
 		{
-			this->brush_character = "╬";
+			this->brush.symbol = "╬";
 			return true;
 		}
 		bool brush_character_changed = this->run_brush_menu(this->brush_map[key]);
@@ -317,15 +322,94 @@ bool App::run_brush_menu_loop(const vector<string>& brush_options)
 			size_t index = size_t(key[0] - '0');
 			if (index >= brush_options.size())
 				continue;
-			this->brush_character = brush_options[index];
+			this->brush.symbol = brush_options[index];
 		}
 		else
 		{
 			size_t index = size_t(key[0] - 'a' + 10);
 			if (index >= brush_options.size())
 				continue;
-			this->brush_character = brush_options[index];
+			this->brush.symbol = brush_options[index];
 		}
 		return true;
 	}
+}
+
+void App::run_color_menu()
+{
+	ynot::Menu color_menu("choose a color category", { "foreground", "background", "return" });
+	string category = color_menu.run();
+	ynot::alternate_screen_buffer();
+	if (category == "return")
+		return;
+	this->print_color_options(category);
+	ynot::print("Enter a color's number, or enter zero for the default color:\n");
+	ynot::set_cursor_style(CursorStyle::not_hidden);
+	string color_number_s = this->get_color_number_input();
+	ynot::set_cursor_style(CursorStyle::hidden);
+	if (color_number_s.empty())
+		return;
+	if (category == "foreground")
+	{
+		regex fg_pattern("\x1b\\[38;5;\\d{1,3}m");
+		this->brush.color = regex_replace(this->brush.color, fg_pattern, "");
+		if (color_number_s == "0")
+			return;
+		this->brush.color += "\x1b[38;5;" + color_number_s + "m";
+	}
+	else
+	{
+		regex bg_pattern("\x1b\\[48;5;\\d{1,3}m");
+		this->brush.color = regex_replace(this->brush.color, bg_pattern, "");
+		if (color_number_s == "0")
+			return;
+		this->brush.color.append("\x1b[48;5;" + color_number_s + "m");
+	}
+}
+
+string App::get_color_number_input()
+{
+	string color_number_s = "";
+	while (true)
+	{
+		string key = ynot::get_key();
+		if (key == "escape")
+			return "";
+		if (key == "enter"
+			&& color_number_s.size() >= 1
+			&& stoi(color_number_s) <= 255
+		)
+			return color_number_s;
+		if (key == "backspace")
+		{
+			color_number_s.pop_back();
+			ynot::backspace_chars(1);
+			continue;
+		}
+		if (!this->is_number(key) || color_number_s.size() == 3)
+			continue;
+		color_number_s += key;
+		ynot::print(key);
+	}
+}
+
+void App::print_color_options(string category)
+{
+	ynot::set_cursor_coords(1, 1);
+	string options = "";
+	for (int i = 0; i <= 255; i++)
+	{
+		string s = to_string(i);
+		if (category == "foreground")
+			options += " \x1b[38;5;" + s + "m" + s;
+		else
+			options += " \x1b[48;5;" + s + "m" + s;
+	}
+	ynot::print(ynot::wrap(options + "\x1b[0m", this->window_size.x * 3) + "\n\n");
+}
+
+bool App::is_number(string str)
+{
+	return !str.empty() && std::find_if(str.begin(),
+		str.end(), [](unsigned char c) { return !std::isdigit(c); }) == str.end();
 }
