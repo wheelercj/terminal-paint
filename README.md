@@ -1,16 +1,18 @@
 # terminal paint
 
-Draw in the terminal using your mouse!
+Draw in the terminal with your mouse or touchscreen!
 
-![demo](https://media.giphy.com/media/XAUcYQJnqrdlEYhhLE/giphy.gif)
+![demo](https://media.giphy.com/media/9EJpbGOsraRrup46iY/giphy.gif)
 
 This app requires the windows.h header file which is normally only available in Windows.
 
 ## features
 
-* Left click to draw, right click to erase.
+* Left click to draw and right click to erase, or use a touchscreen/stylus/etc.
 * Draw with any Unicode symbol including emoji.
-* Save to and load from files.
+* Choose from hundreds of color options.
+* Box-drawing characters automatically join to each other.
+* Easily save, load, and export your drawings.
 
 ## download
 
